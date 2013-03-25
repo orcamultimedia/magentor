@@ -24,6 +24,7 @@ module Magento
   autoload :CustomerAddress,     "magento/customer_address"
   autoload :CustomerGroup,       "magento/customer_group"
   autoload :Customer,            "magento/customer"
+  autoload :GiftcardAccount,     "magento/giftcard_account"
   autoload :Inventory,           "magento/inventory"
   autoload :Invoice,             "magento/invoice"
   autoload :OrderItem,           "magento/order_item"
