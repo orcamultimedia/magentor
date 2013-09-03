@@ -36,6 +36,7 @@ Gem::Specification.new do |s|
     "lib/magentor/customer.rb",
     "lib/magentor/customer_address.rb",
     "lib/magentor/customer_group.rb",
+    "lib/magentor/giftcard_account.rb",
     "lib/magentor/inventory.rb",
     "lib/magentor/invoice.rb",
     "lib/magentor/order.rb",
