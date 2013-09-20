@@ -28,9 +28,7 @@ module Magento
 
       def connect!
         logger.debug "call: login"
-        retry_on_connection_error do
-          @session = client.call("login", config[:username], config[:api_key])
-        end
+        @session = client.call("login", config[:username], config[:api_key])
       end
 
       def cache?
@@ -40,35 +38,23 @@ module Magento
       def call_without_caching(method = nil, *args)
         logger.debug "call: #{method}, #{args.inspect}"
         connect
-        retry_on_connection_error do
-          client.call_async("call", session, method, args)
-        end
+        client.call_async("call", session, method, args)
       rescue XMLRPC::FaultException => e
         logger.debug "exception: #{e.faultCode} -> #{e.faultString}"
-        if e.faultCode == 5 # Session timeout
-          connect!
-          retry
-        end
         raise Magento::ApiError.new e.faultCode, e.faultString
       end
 
       def multicall_without_caching(*calls)
         logger.debug "multicall: #{calls.inspect}"
         connect
-        retry_on_connection_error do
-          ret = client.call_async("multiCall", session, [*calls])
-          ret.each do |e|
-            if e.class == Hash and e["isFault"] then
-              logger.debug "exception: #{e["faultCode"]} -> #{e["faultMessage"]}"
-            end
+        ret = client.call_async("multiCall", session, [*calls])
+        ret.each do |e|
+          if e.class == Hash and e["isFault"] then
+            logger.debug "exception: #{e["faultCode"]} -> #{e["faultMessage"]}"
           end
-          return ret
         end
+        return ret
       rescue XMLRPC::FaultException => e
-        if e.faultCode == 5 # Session timeout
-          connect!
-          retry
-        end
         raise Magento::ApiError, "#{e.faultCode} -> #{e.faultString}"
       end
 
@@ -82,17 +68,5 @@ module Magento
         "#{config[:username]}@#{config[:host]}:#{config[:port]}#{config[:path]}/#{method}/#{args.inspect}"
       end
 
-      def retry_on_connection_error
-        attempts = 0
-        begin
-          yield
-        rescue EOFError
-          attempts += 1
-          retry if attempts < 3
-        rescue RuntimeError
-          attempts += 1
-          retry if attempts < 3
-        end
-      end
   end
 end
