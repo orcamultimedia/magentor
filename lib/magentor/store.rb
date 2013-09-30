@@ -12,8 +12,8 @@ module Magento
       # Arguments:
       # 
       # int SessionId - Session Id
-      def list(*args)
-        results = commit("list", *args)
+      def list
+        results = commit("list", nil)
         results.collect do |result|
           new(result)
         end
