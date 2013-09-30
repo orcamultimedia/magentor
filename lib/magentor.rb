@@ -45,4 +45,5 @@ module Magento
   autoload :ProductType,         "magentor/product_type"
   autoload :Region,              "magentor/region"
   autoload :Shipment,            "magentor/shipment"
+  autoload :Store,               "magentor/store"
 end
