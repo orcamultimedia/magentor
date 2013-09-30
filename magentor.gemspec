@@ -51,6 +51,7 @@ Gem::Specification.new do |s|
     "lib/magentor/product_type.rb",
     "lib/magentor/region.rb",
     "lib/magentor/shipment.rb",
+    "lib/magentor/store.rb",
     "magentor.gemspec"
   ]
   s.homepage = "http://github.com/pstuteville/magentor"
