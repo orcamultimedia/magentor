@@ -38,7 +38,7 @@ module Magento
       def call_without_caching(method = nil, *args)
         logger.debug "call: #{method}, #{args.inspect}"
         connect
-        client.call_async("call", session, method, args)
+        client.call("call", session, method, args)
       rescue XMLRPC::FaultException => e
         logger.debug "exception: #{e.faultCode} -> #{e.faultString}"
         raise Magento::ApiError.new e.faultCode, e.faultString
@@ -47,7 +47,7 @@ module Magento
       def multicall_without_caching(*calls)
         logger.debug "multicall: #{calls.inspect}"
         connect
-        ret = client.call_async("multiCall", session, [*calls])
+        ret = client.call("multiCall", session, [*calls])
         ret.each do |e|
           if e.class == Hash and e["isFault"] then
             logger.debug "exception: #{e["faultCode"]} -> #{e["faultMessage"]}"
