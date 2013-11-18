@@ -27,8 +27,7 @@ module Magento
     private
 
       def connect!
-        logger.debug "call: login"
-        @session = client.call("login", config[:username], config[:api_key])
+        @session = client.call('login', config[:username], config[:api_key])
       end
 
       def cache?
@@ -36,20 +35,16 @@ module Magento
       end
 
       def call_without_caching(method = nil, *args)
-        logger.debug "call: #{method}, #{args.inspect}"
-        connect
-        client.call("call", session, method, args)
+        call_client('call', method, args)
       rescue XMLRPC::FaultException => e
         logger.debug "exception: #{e.faultCode} -> #{e.faultString}"
         raise Magento::ApiError.new e.faultCode, e.faultString
       end
 
       def multicall_without_caching(*calls)
-        logger.debug "multicall: #{calls.inspect}"
-        connect
-        ret = client.call("multiCall", session, [*calls])
+        ret = call_client('multiCall', calls)
         ret.each do |e|
-          if e.class == Hash and e["isFault"] then
+          if e.class == Hash and e['isFault'] then
             logger.debug "exception: #{e["faultCode"]} -> #{e["faultMessage"]}"
           end
         end
@@ -62,6 +57,13 @@ module Magento
         config[:cache_store].fetch(cache_key(method, *args)) do
           call_without_caching(method, *args)
         end
+      end
+
+      def call_client *args
+        method = args.shift
+        logger.debug "#{self.class.to_s} #{method}#{' async' if config[:async]}: #{args.map(&:inspect).join(', ')}"
+        connect
+        config[:async] ? client.call_async(method, session, *args) : client.call(method, session, *args)
       end
 
       def cache_key(method, *args)
